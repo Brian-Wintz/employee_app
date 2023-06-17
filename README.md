@@ -1,7 +1,5 @@
 # Employee App
 
-An application to manage company employees
-
 The initial purpose of this project is to understand how to manage persistence of a POJO (plain old java object) using a MariaDB database. The objectives are as follows:
 * Provide a generic mechanism that provides for create/read/update/delete (crud) management of a database record for a POJO
 * Identify what information needs to be configured by the POJO to allow this generic crud management to work
