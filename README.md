@@ -66,8 +66,10 @@ The previous part of this implementation focused on managing persistence of an E
 }}]}
 Next, a company.html page that makes use of jquery to construct a table to display these Employee records was created.  This required figuring out how to make use of jquery's $.ajax syntax, as well as how to properly add rows to the table.  When the page is loaded (onload), it makes a call to the /employees REST API and processes the resulting Employee data to dynamically add a row for each record into the table.  Below is an example showing the three records currently in my database table:
 ![image](https://github.com/Brian-Wintz/employee_app/assets/133924124/828106a7-0df9-47bd-ac12-801cdeb7797a)
+
 Below is a diagram showing the relationship between these main components:
 ![image](https://github.com/Brian-Wintz/employee_app/assets/133924124/77db64f4-e350-4a9f-b465-b71f7b77dd35)
+
 The flow is as follows:
 1. A request is made to display the company.html (http://localhost:8080/company/company.html)
 2. On load of this page, javascript is executed which makes a REST API call (http://localhost:8080/company/employees)
