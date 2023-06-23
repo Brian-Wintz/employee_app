@@ -3,7 +3,6 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,9 +12,6 @@ import com.bkw.GenericDataAccess;
 import com.bkw.IGenericField;
 import com.bkw.employee.Employee;
 
-//import com.google.gson.*;
-
-@WebServlet("/employees")
 public class EmployeesServlet extends HttpServlet {
 
     @Override
@@ -26,20 +22,13 @@ public class EmployeesServlet extends HttpServlet {
 
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
-        //GsonBuilder builder=new GsonBuilder();
-        //builder.setPrettyPrinting();
-        //builder.serializeNulls();
-        //Gson gson=builder.create();
         String json="{ \"Employees\": [";
 
         for(int i=0; i<employees.size(); ++i) {
             String jsonEmp=employees.get(i).toString();
-            json+=(i>0?",":"")+"{ \"Employee\": "+jsonEmp + "\n}";
+            json+=(i>0?",":"")+jsonEmp;
         }
         json+="]}";
-        //json=gson.toJson(employees);
-        //System.out.println(json);
-        //out.println(new JSONSerializer().serialize(employees));
         out.println(json);
     }
 
@@ -53,20 +42,13 @@ public class EmployeesServlet extends HttpServlet {
         Employee emp=new Employee();
         List<GenericBean<IGenericField, Object>> employees = GenericDataAccess.readAll(emp,Employee.Field.values());
 
-        //GsonBuilder builder=new GsonBuilder();
-        //builder.setPrettyPrinting();
-        //builder.serializeNulls();
-        //Gson gson=builder.create();
         String json="{ \"Employees\": [";
 
         for(int i=0; i<employees.size(); ++i) {
-            // Need to convert from GenericBean to an Employee instance
-            //Employee e=new Employee(employees.get(i));
             String jsonEmp=employees.get(i).toString();
-            json+=(i>0?",":"")+"{ \"Employee\": "+jsonEmp + "\n}";
+            json+=(i>0?",":"")+jsonEmp;
         }
         json+="]}";
-        //json=gson.toJson(employees);
         System.out.println(json);
 
     }

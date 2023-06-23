@@ -7,7 +7,6 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ArrayList;
-import java.lang.Class;
 import java.lang.reflect.Constructor;
 
 public class GenericDataAccess {
@@ -16,8 +15,11 @@ public class GenericDataAccess {
     private static String user="root";
     private static String password="admin";
 
+    private GenericDataAccess() {
+    }
+
     // For a specified GenericBean, build a where clause to isolate the record based on its key field values
-    protected static String getKeyWhere(GenericBean bean,IGenericField[] fields) {
+    protected static String getKeyWhere(GenericBean<IGenericField, Object> bean,IGenericField[] fields) {
         String whereClause="";
         for(IGenericField field: fields) {
             if(field.isKey()) whereClause+=(whereClause.length()>0?" and ":"")+field.getFieldName()+"="+getStringValue(bean,field);
@@ -29,7 +31,7 @@ public class GenericDataAccess {
     }
 
     // Retrieves a String value appropriate for use in a SQL update or insert statement
-    protected static String getStringValue(GenericBean bean,IGenericField field) {
+    protected static String getStringValue(GenericBean<IGenericField, Object> bean,IGenericField field) {
         String result="";
         if(bean.containsKey(field)) {
             if(field.getDataType()==GenericBean.DataType.STRING)
@@ -40,14 +42,14 @@ public class GenericDataAccess {
                     result="'" + new SimpleDateFormat("yyyy-MM-dd").format(sqlDate) + "'";
                 }
                 else
-                result=bean.get(field).toString();
+                    result=bean.get(field).toString();
             }
         }
         return result;
     }
 
     // Deletes the specified GenericBean based on it's key field values (only key field values need to be specified)
-    public static void delete(GenericBean bean,IGenericField[] fields) {
+    public static void delete(GenericBean<IGenericField, Object> bean,IGenericField[] fields) {
         BasicConnectionPool bcp=null;
         Connection conn=null;
         try {
@@ -66,10 +68,10 @@ System.out.println("delete:"+delete);
     }
 
     // Creates a record for the specified GenericBean
-    public static GenericBean create(GenericBean bean, IGenericField[] fieldEnum) {
+    public static GenericBean<IGenericField, Object> create(GenericBean<IGenericField, Object> bean, IGenericField[] fieldEnum) {
         BasicConnectionPool bcp=null;
         Connection conn=null;
-        GenericBean emp=null;
+        GenericBean<IGenericField, Object> emp=null;
         try {
             bcp=BasicConnectionPool.create(url,user,password);
             conn=bcp.getConnection();
@@ -98,10 +100,10 @@ System.out.println("insert:"+insert);
     }
 
     // Updates an existing record for the provided GenericBean using the key field values
-    public static GenericBean update(GenericBean bean, IGenericField[] fields) {
+    public static GenericBean<IGenericField, Object> update(GenericBean<IGenericField, Object> bean, IGenericField[] fields) {
         BasicConnectionPool bcp=null;
         Connection conn=null;
-        GenericBean emp=null;
+        GenericBean<IGenericField, Object> emp=null;
         try {
             bcp=BasicConnectionPool.create(url,user,password);
             conn=bcp.getConnection();
@@ -130,7 +132,7 @@ System.out.println("update:"+update);
     }
 
     // Reads the record for the specified GenericBean using its key field values
-    public static GenericBean read(GenericBean bean, IGenericField[] fields) {
+    public static GenericBean<IGenericField, Object> read(GenericBean<IGenericField, Object> bean, IGenericField[] fields) {
         BasicConnectionPool bcp=null;
         Connection conn=null;
         try {

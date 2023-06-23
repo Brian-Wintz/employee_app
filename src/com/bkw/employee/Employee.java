@@ -2,7 +2,6 @@ package com.bkw.employee;
 
 import java.sql.Date;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.List;
 import java.time.LocalDate;
 
@@ -179,8 +178,7 @@ public class Employee extends GenericBean<IGenericField, Object> {
 
     @Override
     public String toString() {
-        //String result="{\n  \""+this.getName()+"\": {";
-        String result="{\n";
+        String result="{\n  \""+this.getName()+"\": {";
         boolean isFirst=true;
         for(Employee.Field field: Employee.Field.values()) {
             if(this.get(field)!=null) {
@@ -193,7 +191,6 @@ public class Employee extends GenericBean<IGenericField, Object> {
                         Date date=(Date)this.get(field);
                         LocalDate localDate=date.toLocalDate();
                         value="\""+localDate.format(DateTimeFormatter.ISO_LOCAL_DATE)+"\"";
-                        //value="\""+date.toLocaleString()+"\"";
                     }
                     else
                         value=this.get(field).toString();
@@ -201,7 +198,7 @@ public class Employee extends GenericBean<IGenericField, Object> {
                 isFirst=false;
             }
         }
-        result+="\n}";
+        result+="\n}}";
         return result;
     }
 
