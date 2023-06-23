@@ -1,6 +1,10 @@
 package com.bkw.employee;
 
 import java.sql.Date;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.List;
+import java.time.LocalDate;
 
 import com.bkw.GenericBean;
 import com.bkw.IGenericField;
@@ -47,6 +51,14 @@ public class Employee extends GenericBean<IGenericField, Object> {
 
         public boolean isKey() {
             return this.isKey;
+        }
+    }
+
+    public Employee(GenericBean<IGenericField, Object> bean) {
+        for(Employee.Field field: Employee.Field.values()) {
+            if(bean.containsKey(field)) {
+                this.put(field,bean.get(field));
+            }
         }
     }
 
@@ -167,16 +179,26 @@ public class Employee extends GenericBean<IGenericField, Object> {
 
     @Override
     public String toString() {
-        String result=this.getName()+"{";
+        //String result="{\n  \""+this.getName()+"\": {";
+        String result="{\n";
+        boolean isFirst=true;
         for(Employee.Field field: Employee.Field.values()) {
             if(this.get(field)!=null) {
                 String fieldName=field.getFieldName();
                 String value="";
                 if(field.getDataType()==GenericBean.DataType.STRING)
-                    value="'"+this.get(field)+"'";
+                    value="\""+this.get(field)+"\"";
                 else
-                    value=this.get(field).toString();
-                result+="\n  "+fieldName+"="+value;
+                    if(field.getDataType()==GenericBean.DataType.DATE) {
+                        Date date=(Date)this.get(field);
+                        LocalDate localDate=date.toLocalDate();
+                        value="\""+localDate.format(DateTimeFormatter.ISO_LOCAL_DATE)+"\"";
+                        //value="\""+date.toLocaleString()+"\"";
+                    }
+                    else
+                        value=this.get(field).toString();
+                result+=(!isFirst?",":"")+"\n  \""+fieldName+"\": "+value;
+                isFirst=false;
             }
         }
         result+="\n}";
@@ -184,8 +206,13 @@ public class Employee extends GenericBean<IGenericField, Object> {
     }
 
     public static void main(String[] args) {
+        // Read all employees
+        Employee emp=new Employee();
+        List<GenericBean<IGenericField, Object>> list=GenericDataAccess.readAll(emp,Employee.Field.values());
+        System.out.println("All:"+list);
+
         // Read existing employee
-        Employee emp=new Employee(1);
+        emp=new Employee(1);
         emp=(Employee)GenericDataAccess.read(emp,Employee.Field.values());
         System.out.println("Read: "+emp);
 

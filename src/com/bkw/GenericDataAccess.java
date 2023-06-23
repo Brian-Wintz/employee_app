@@ -5,6 +5,10 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.ArrayList;
+import java.lang.Class;
+import java.lang.reflect.Constructor;
 
 public class GenericDataAccess {
     // DB connection constants (should be externalized)
@@ -159,4 +163,54 @@ System.out.println("read:"+query);
         }
         return bean;
     }
-}
+
+    private static Constructor getConstructor(Class c) {
+        Constructor constructor=null;
+        try {
+            constructor=c.getConstructor(null);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return constructor;
+    }
+    // Reads the record for the specified GenericBean using its key field values
+    public static List<GenericBean<IGenericField, Object>> readAll(GenericBean<IGenericField, Object> bean,IGenericField[] fields) {
+        BasicConnectionPool bcp=null;
+        Connection conn=null;
+        List<GenericBean<IGenericField, Object>> list=new ArrayList<>();
+        Class c=bean.getClass();
+System.out.println("readAll:"+bean+":"+c);
+        Constructor constructor=getConstructor(c);
+        if(constructor==null) return list;
+        try {
+            bcp=BasicConnectionPool.create(url,user,password);
+            conn=bcp.getConnection();
+            Statement stmt = conn.createStatement();
+
+            String query="select * from "+bean.getTableName();
+System.out.println("readAll:"+query);
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next()){
+                GenericBean<IGenericField, Object> thisBean=(GenericBean<IGenericField, Object>)c.newInstance();
+                for(IGenericField field: fields) {
+                    String fieldName=field.getFieldName();
+                    if(field.getDataType()==GenericBean.DataType.STRING)
+                        thisBean.put(field,rs.getString(fieldName));
+                    else {
+                        if(field.getDataType()==GenericBean.DataType.DATE)
+                            thisBean.put(field,java.sql.Date.valueOf(rs.getString(fieldName)));
+                        if(field.getDataType()==GenericBean.DataType.INTEGER)
+                            thisBean.put(field,Integer.valueOf(rs.getString(fieldName)));
+                    }
+                }
+System.out.println("bean:"+thisBean.toString());
+                list.add(thisBean);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            if(bcp!=null && conn!=null) bcp.releaseConnection(conn);
+        }
+        return list;
+    }}

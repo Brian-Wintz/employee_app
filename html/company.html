@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="jquery-dev.js"></script>
+<style>
+table, th, td {
+  border: 1px solid black;
+}
+</style>
+</head>
+
+<script>
+	function loadEmployees() {
+		var url="employees";
+		var $table=$('#employeeTable');
+		var $body=$table.find('#body');
+		$.ajax({
+			url: url,
+			dataType: "json",
+			async: false,
+			success: function(data) {
+				for(var i=0; i<data.Employees.length; ++i) {
+					// Add a new row for each employee record
+					var html="<tr><td><div id=\"FirstName\" contenteditable>"+data.Employees[i].Employee.FirstName+"</div></td>";
+					html+="<td><div id=\"LastName\" contenteditable>"+data.Employees[i].Employee.LastName+"</div></td>";
+					html+="<td><div id=\"EmployeeID\" contenteditable>"+data.Employees[i].Employee.EmployeeID+"</div></td>";
+					html+="<td><div id=\"Employer\" contenteditable>"+data.Employees[i].Employee.Employer+"</div></td>";
+					html+="<td><div id=\"Address\" contenteditable>"+data.Employees[i].Employee.Address+"</div></td>";
+					html+="<td><div id=\"City\" contenteditable>"+data.Employees[i].Employee.City+"</div></td>";
+					html+="<td><div id=\"State\" contenteditable>"+data.Employees[i].Employee.State+"</div></td>";
+					html+="<td><div id=\"PostalCode\" contenteditable>"+data.Employees[i].Employee.PostalCode+"</div></td>";
+					html+="<td><input id=\"StartDate\" type=\"date\"></input></td>";
+					html+="<td><div id=\"MobilePhone\" contenteditable>"+data.Employees[i].Employee.MobilePhone+"</div></td>";
+					html+="</tr>";
+					$body.append(html);
+				}
+			    // Now that the date input control is created, set its value (8th column)
+				for(var i=0; i<data.Employees.length; ++i) {
+					$('#employeeTable tr')[i+1].getElementsByTagName('td')[8].getElementsByTagName('input')[0].value=data.Employees[i].Employee.StartDate;
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("ERROR:"+errorThrown);
+			},
+		});
+	};
+</script>
+<body onload="loadEmployees()">
+
+<h1>Company Employees</h1>
+<table id="employeeTable">
+	<thead id='head'>
+		<tr>
+			<th>First Name</th>
+			<th>Last Name</th>
+			<th>Employee ID</th>
+			<th>Company</th>
+			<th>Address</th>
+			<th>City</th>
+			<th>State</th>
+			<th>Postal Code</th>
+			<th>Start Date</th>
+			<th>Mobile</th>
+		</tr>
+	</thead>
+	<tbody id='body'></tbody>
+</table>
+
+</body>
+</html>
